@@ -92,7 +92,7 @@ namespace PureSketch
             DrawingVisual drawingVisual = new DrawingVisual();
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
-                drawingContext.DrawImage(tempRtb, new Rect(0, 0, width, height), new Rect(toolboxWidth, 0, canvas.ActualWidth, canvas.ActualHeight));
+                drawingContext.DrawImage(tempRtb, new Rect(0, 0, width, height));
             }
             finalRtb.Render(drawingVisual);
 
