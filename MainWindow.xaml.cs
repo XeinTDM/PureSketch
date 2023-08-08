@@ -10,8 +10,8 @@ namespace PureSketch
 {
     public partial class MainWindow : Window
     {
-        private readonly StrokeCollection _undoStrokes = new StrokeCollection();
-        private StrokeCollection _clipboardStrokes = new StrokeCollection();
+        private readonly StrokeCollection _undoStrokes = new();
+        private StrokeCollection _clipboardStrokes = new();
 
         public MainWindow()
         {
@@ -67,7 +67,7 @@ namespace PureSketch
             paintCanvas.Strokes.Clear();
         }
 
-        private void SaveCanvasAsPng(string filename, InkCanvas canvas)
+        private static void SaveCanvasAsPng(string filename, InkCanvas canvas)
         {
             int width = (int)canvas.ActualWidth;
             int height = (int)canvas.ActualHeight;
@@ -81,22 +81,22 @@ namespace PureSketch
             int toolboxWidth = 150; // Adjust as per your toolbox width
 
             // Create a temporary RenderTargetBitmap to capture InkCanvas
-            RenderTargetBitmap tempRtb = new RenderTargetBitmap((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96d, 96d, PixelFormats.Default);
+            RenderTargetBitmap tempRtb = new((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96d, 96d, PixelFormats.Default);
             tempRtb.Render(canvas);
 
             width -= toolboxWidth;
 
-            RenderTargetBitmap finalRtb = new RenderTargetBitmap(width, height, 96d, 96d, PixelFormats.Default);
+            RenderTargetBitmap finalRtb = new(width, height, 96d, 96d, PixelFormats.Default);
 
             // Offset the drawing to "crop" out the toolbox area
-            DrawingVisual drawingVisual = new DrawingVisual();
+            DrawingVisual drawingVisual = new();
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
                 drawingContext.DrawImage(tempRtb, new Rect(0, 0, width, height));
             }
             finalRtb.Render(drawingVisual);
 
-            PngBitmapEncoder pngEncoder = new PngBitmapEncoder();
+            PngBitmapEncoder pngEncoder = new();
             pngEncoder.Frames.Add(BitmapFrame.Create(finalRtb));
 
             using (FileStream fs = File.OpenWrite(filename))
@@ -131,7 +131,7 @@ namespace PureSketch
             if (openFileDialog.ShowDialog() == true)
             {
                 using var fs = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
-                StrokeCollection strokes = new StrokeCollection(fs);
+                StrokeCollection strokes = new(fs);
                 paintCanvas.Strokes = strokes;
                 fs.Close();
             }
