@@ -3,48 +3,58 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="Modern Paint"
-    Width="850"
-    Height="500"
+    Title="PureSketch"
+    Width="900"
+    Height="600"
     Background="{DynamicResource MaterialDesignPaper}"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}">
 
-    <Grid>
-        <InkCanvas
-            Name="paintCanvas"
-            Margin="10"
-            Background="White"
-            Cursor="Pen" />
+    <DockPanel>
+        <!--  Top Menu  -->
+        <Menu VerticalAlignment="Top" DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Click="OnNewClick" Header="New" />
+                <MenuItem Click="OnOpenClick" Header="Open" />
+                <MenuItem Click="OnSaveClick" Header="Save" />
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Click="OnCutClick" Header="Cut" />
+                <MenuItem Click="OnCopyClick" Header="Copy" />
+                <MenuItem Click="OnPasteClick" Header="Paste" />
+            </MenuItem>
+        </Menu>
 
+        <!--  Left toolbox  -->
         <StackPanel
-            Margin="10"
-            VerticalAlignment="Top"
-            Orientation="Horizontal">
+            Width="150"
+            Margin="5"
+            Background="{DynamicResource MaterialDesignCardBackground}"
+            DockPanel.Dock="Left"
+            Orientation="Vertical">
             <Button
-                Margin="5"
+                Margin="10"
                 Click="OnClearClick"
                 Content="Clear"
-                Style="{DynamicResource MaterialDesignRaisedButton}" />
+                Style="{DynamicResource MaterialDesignFlatButton}" />
             <Button
-                Margin="5"
+                Margin="10"
                 Click="OnUndoClick"
                 Content="Undo"
-                Style="{DynamicResource MaterialDesignRaisedButton}" />
+                Style="{DynamicResource MaterialDesignFlatButton}" />
             <Button
-                Margin="5"
+                Margin="10"
                 Click="OnRedoClick"
                 Content="Redo"
-                Style="{DynamicResource MaterialDesignRaisedButton}" />
+                Style="{DynamicResource MaterialDesignFlatButton}" />
+
             <TextBlock
-                Margin="5"
+                Margin="10"
                 VerticalAlignment="Center"
                 Text="Color:" />
-
-            <!--  A color picker using ComboBox  -->
             <ComboBox
                 Name="colorPicker"
-                Width="100"
-                Margin="5"
+                Width="120"
+                Margin="10"
                 SelectionChanged="OnColorChanged"
                 Style="{DynamicResource MaterialDesignComboBox}">
                 <ComboBoxItem>Black</ComboBoxItem>
@@ -53,19 +63,25 @@
                 <ComboBoxItem>Blue</ComboBoxItem>
             </ComboBox>
 
-            <!--  Slider for stroke thickness  -->
             <TextBlock
-                Margin="5"
+                Margin="10"
                 VerticalAlignment="Center"
                 Text="Thickness:" />
             <Slider
                 Name="thicknessSlider"
-                Width="100"
-                Margin="5"
+                Width="120"
+                Margin="10"
                 Maximum="10"
                 Minimum="1"
                 ValueChanged="OnThicknessChanged"
                 Value="2" />
         </StackPanel>
-    </Grid>
+
+        <!--  Drawing Canvas  -->
+        <InkCanvas
+            Name="paintCanvas"
+            Margin="10"
+            Background="White"
+            Cursor="Pen" />
+    </DockPanel>
 </Window>
