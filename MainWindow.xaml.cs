@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using System.Windows.Ink;
 using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace PureSketch
 {
@@ -15,7 +16,7 @@ namespace PureSketch
         public MainWindow()
         {
             InitializeComponent();
-            paintCanvas.DefaultDrawingAttributes.Color = Colors.Black; // default color
+            paintCanvas.DefaultDrawingAttributes.Color = Colors.Black;
         }
 
         private void OnClearClick(object sender, RoutedEventArgs e)
@@ -66,21 +67,58 @@ namespace PureSketch
             paintCanvas.Strokes.Clear();
         }
 
-        // Save Canvas Strokes to a File
+        private void SaveCanvasAsPng(string filename, InkCanvas canvas)
+        {
+            int width = (int)canvas.ActualWidth;
+            int height = (int)canvas.ActualHeight;
+
+            if (width <= 0 || height <= 0)
+            {
+                MessageBox.Show("Canvas size is invalid.");
+                return;
+            }
+
+            int toolboxWidth = 150; // Adjust as per your toolbox width
+
+            // Create a temporary RenderTargetBitmap to capture InkCanvas
+            RenderTargetBitmap tempRtb = new RenderTargetBitmap((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96d, 96d, PixelFormats.Default);
+            tempRtb.Render(canvas);
+
+            width -= toolboxWidth;
+
+            RenderTargetBitmap finalRtb = new RenderTargetBitmap(width, height, 96d, 96d, PixelFormats.Default);
+
+            // Offset the drawing to "crop" out the toolbox area
+            DrawingVisual drawingVisual = new DrawingVisual();
+            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            {
+                drawingContext.DrawImage(tempRtb, new Rect(0, 0, width, height), new Rect(toolboxWidth, 0, canvas.ActualWidth, canvas.ActualHeight));
+            }
+            finalRtb.Render(drawingVisual);
+
+            PngBitmapEncoder pngEncoder = new PngBitmapEncoder();
+            pngEncoder.Frames.Add(BitmapFrame.Create(finalRtb));
+
+            using (FileStream fs = File.OpenWrite(filename))
+            {
+                pngEncoder.Save(fs);
+            }
+        }
+
+
         private void OnSaveClick(object sender, RoutedEventArgs e)
         {
             var saveFileDialog = new SaveFileDialog
             {
-                Filter = "Ink Files (*.ink)|*.ink"
+                Filter = "PNG Files (*.png)|*.png"
             };
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                using var fs = new FileStream(saveFileDialog.FileName, FileMode.Create);
-                paintCanvas.Strokes.Save(fs);
-                fs.Close();
+                SaveCanvasAsPng(saveFileDialog.FileName, paintCanvas);
             }
         }
+
 
         // Load Canvas Strokes from a File
         private void OnOpenClick(object sender, RoutedEventArgs e)
