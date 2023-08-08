@@ -1,0 +1,71 @@
+﻿<Window
+    x:Class="PureSketch.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="Modern Paint"
+    Width="850"
+    Height="500"
+    Background="{DynamicResource MaterialDesignPaper}"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}">
+
+    <Grid>
+        <InkCanvas
+            Name="paintCanvas"
+            Margin="10"
+            Background="White"
+            Cursor="Pen" />
+
+        <StackPanel
+            Margin="10"
+            VerticalAlignment="Top"
+            Orientation="Horizontal">
+            <Button
+                Margin="5"
+                Click="OnClearClick"
+                Content="Clear"
+                Style="{DynamicResource MaterialDesignRaisedButton}" />
+            <Button
+                Margin="5"
+                Click="OnUndoClick"
+                Content="Undo"
+                Style="{DynamicResource MaterialDesignRaisedButton}" />
+            <Button
+                Margin="5"
+                Click="OnRedoClick"
+                Content="Redo"
+                Style="{DynamicResource MaterialDesignRaisedButton}" />
+            <TextBlock
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Color:" />
+
+            <!--  A color picker using ComboBox  -->
+            <ComboBox
+                Name="colorPicker"
+                Width="100"
+                Margin="5"
+                SelectionChanged="OnColorChanged"
+                Style="{DynamicResource MaterialDesignComboBox}">
+                <ComboBoxItem>Black</ComboBoxItem>
+                <ComboBoxItem>Red</ComboBoxItem>
+                <ComboBoxItem>Green</ComboBoxItem>
+                <ComboBoxItem>Blue</ComboBoxItem>
+            </ComboBox>
+
+            <!--  Slider for stroke thickness  -->
+            <TextBlock
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Thickness:" />
+            <Slider
+                Name="thicknessSlider"
+                Width="100"
+                Margin="5"
+                Maximum="10"
+                Minimum="1"
+                ValueChanged="OnThicknessChanged"
+                Value="2" />
+        </StackPanel>
+    </Grid>
+</Window>
