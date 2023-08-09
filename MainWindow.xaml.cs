@@ -28,7 +28,9 @@ namespace PureSketch
             LayersListBox.ItemsSource = _layers;
             AddNewLayer();
             paintCanvas.StrokeCollected += OnPaintCanvasStrokeCollected;
+            ShowCanvasSizeDialog();
         }
+
 
         private void AddNewLayer()
         {
