@@ -20,20 +20,20 @@ namespace PureSketch
         public MainWindow()
         {
             InitializeComponent();
+            canvasSizeDialog.DialogConfirmed += CanvasSizeDialog_Confirmed;
+            ShowCanvasSizeDialog();
+        }
 
-            CanvasSizeDialog sizeDialog = new CanvasSizeDialog();
-            if (sizeDialog.ShowDialog() == true)
-            {
-                paintCanvas.Width = sizeDialog.CanvasWidth;
-                paintCanvas.Height = sizeDialog.CanvasHeight;
-            }
-            else
-            {
-                // Handle case where user closes the dialog without entering values, e.g., close the application.
-                this.Close();
-            }
+        private void ShowCanvasSizeDialog()
+        {
+            canvasSizeDialog.Visibility = Visibility.Visible;
+        }
 
-            paintCanvas.DefaultDrawingAttributes.Color = Colors.Black;
+        private void CanvasSizeDialog_Confirmed(object sender, EventArgs e)
+        {
+            // Get the canvas size from the dialog and update the main canvas
+            paintCanvas.Width = canvasSizeDialog.CanvasWidth;
+            paintCanvas.Height = canvasSizeDialog.CanvasHeight;
         }
 
         private void OnMainWindowKeyDown(object sender, KeyEventArgs e)
@@ -109,16 +109,14 @@ namespace PureSketch
 
         private static void SaveCanvasAsPng(string filename, InkCanvas canvas, double width, double height)
         {
-            RenderTargetBitmap rtb = new RenderTargetBitmap((int)width, (int)height, 96d, 96d, PixelFormats.Default);
+            RenderTargetBitmap rtb = new((int)width, (int)height, 96d, 96d, PixelFormats.Default);
             rtb.Render(canvas);
 
-            PngBitmapEncoder pngEncoder = new PngBitmapEncoder();
+            PngBitmapEncoder pngEncoder = new();
             pngEncoder.Frames.Add(BitmapFrame.Create(rtb));
 
-            using (FileStream fs = new FileStream(filename, FileMode.Create))
-            {
-                pngEncoder.Save(fs);
-            }
+            using FileStream fs = new(filename, FileMode.Create);
+            pngEncoder.Save(fs);
         }
 
         private void OnSaveClick(object sender, RoutedEventArgs e)
@@ -140,8 +138,8 @@ namespace PureSketch
 
             if (openFileDialog.ShowDialog() == true)
             {
-                BitmapImage bitmap = new BitmapImage(new Uri(openFileDialog.FileName));
-                Image image = new Image
+                BitmapImage bitmap = new(new Uri(openFileDialog.FileName));
+                Image image = new()
                 {
                     Source = bitmap,
                     Width = bitmap.Width,
@@ -197,7 +195,7 @@ namespace PureSketch
         {
             if (_zoomLevel < 0.2) _zoomLevel = 0.2;
             if (_zoomLevel > 5) _zoomLevel = 5;
-            ScaleTransform scale = new ScaleTransform(_zoomLevel, _zoomLevel);
+            ScaleTransform scale = new(_zoomLevel, _zoomLevel);
             paintCanvas.LayoutTransform = scale;
 
             // Adjust the stroke thickness based on the zoom level
