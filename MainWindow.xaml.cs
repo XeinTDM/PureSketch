@@ -195,7 +195,7 @@ namespace PureSketch
         private void ApplyZoom()
         {
             if (_zoomLevel < 0.2) _zoomLevel = 0.2;
-            if (_zoomLevel > 5) _zoomLevel = 5;
+            if (_zoomLevel > 45) _zoomLevel = 45;
             ScaleTransform scale = new(_zoomLevel, _zoomLevel);
             paintCanvas.LayoutTransform = scale;
 
@@ -232,11 +232,18 @@ namespace PureSketch
 
         private void AdjustZoomToFit()
         {
+            // Calculate the zoom level based on the ratio of the main window's actual width and height to the paintCanvas width and height.
             double xZoom = this.ActualWidth / paintCanvas.Width;
             double yZoom = this.ActualHeight / paintCanvas.Height;
             _zoomLevel = Math.Min(xZoom, yZoom);
+
+            // Ensure the zoom level is within a reasonable range.
+            if (_zoomLevel < 0.2) _zoomLevel = 0.2;
+            if (_zoomLevel > 5) _zoomLevel = 5;
+
             ApplyZoom();
         }
+
 
     }
 }
