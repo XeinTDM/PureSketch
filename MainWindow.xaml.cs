@@ -31,9 +31,9 @@ namespace PureSketch
 
         private void CanvasSizeDialog_Confirmed(object sender, EventArgs e)
         {
-            // Get the canvas size from the dialog and update the main canvas
             paintCanvas.Width = canvasSizeDialog.CanvasWidth;
             paintCanvas.Height = canvasSizeDialog.CanvasHeight;
+            AdjustZoomToFit();
         }
 
         private void OnMainWindowKeyDown(object sender, KeyEventArgs e)
@@ -105,6 +105,7 @@ namespace PureSketch
         private void OnNewClick(object sender, RoutedEventArgs e)
         {
             paintCanvas.Strokes.Clear();
+            ShowCanvasSizeDialog();
         }
 
         private static void SaveCanvasAsPng(string filename, InkCanvas canvas, double width, double height)
@@ -229,6 +230,13 @@ namespace PureSketch
             ApplyZoom();
         }
 
+        private void AdjustZoomToFit()
+        {
+            double xZoom = this.ActualWidth / paintCanvas.Width;
+            double yZoom = this.ActualHeight / paintCanvas.Height;
+            _zoomLevel = Math.Min(xZoom, yZoom);
+            ApplyZoom();
+        }
 
     }
 }

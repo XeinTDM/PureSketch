@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Width="250"
     Height="138"
+    Background="Transparent"
     MouseLeftButtonDown="UserControl_MouseLeftButtonDown">
 
     <Grid Background="#FF777777">
