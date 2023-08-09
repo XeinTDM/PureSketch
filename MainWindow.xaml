@@ -21,6 +21,10 @@
                 <MenuItem Click="OnCutClick" Header="Cut" />
                 <MenuItem Click="OnCopyClick" Header="Copy" />
                 <MenuItem Click="OnPasteClick" Header="Paste" />
+                <Separator />
+                <MenuItem Click="OnClearClick" Header="Clear" />
+                <MenuItem Click="OnUndoClick" Header="Undo" />
+                <MenuItem Click="OnRedoClick" Header="Redo" />
             </MenuItem>
         </Menu>
 
@@ -31,37 +35,16 @@
             Background="{DynamicResource MaterialDesignCardBackground}"
             DockPanel.Dock="Left"
             Orientation="Vertical">
-            <Button
-                Margin="10"
-                Click="OnClearClick"
-                Content="Clear"
-                Style="{DynamicResource MaterialDesignFlatButton}" />
-            <Button
-                Margin="10"
-                Click="OnUndoClick"
-                Content="Undo"
-                Style="{DynamicResource MaterialDesignFlatButton}" />
-            <Button
-                Margin="10"
-                Click="OnRedoClick"
-                Content="Redo"
-                Style="{DynamicResource MaterialDesignFlatButton}" />
 
             <TextBlock
                 Margin="10"
                 VerticalAlignment="Center"
                 Text="Color:" />
-            <ComboBox
-                Name="colorPicker"
+            <TextBox
+                Name="colorHexInput"
                 Width="120"
                 Margin="10"
-                SelectionChanged="OnColorChanged"
-                Style="{DynamicResource MaterialDesignComboBox}">
-                <ComboBoxItem>Black</ComboBoxItem>
-                <ComboBoxItem>Red</ComboBoxItem>
-                <ComboBoxItem>Green</ComboBoxItem>
-                <ComboBoxItem>Blue</ComboBoxItem>
-            </ComboBox>
+                TextChanged="OnColorHexChanged" />
 
             <TextBlock
                 Margin="10"

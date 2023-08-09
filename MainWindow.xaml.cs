@@ -46,15 +46,6 @@ namespace PureSketch
             }
         }
 
-        private void OnColorChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (colorPicker.SelectedItem != null)
-            {
-                var selectedColor = ((ComboBoxItem)colorPicker.SelectedItem).Content.ToString();
-                paintCanvas.DefaultDrawingAttributes.Color = (Color)ColorConverter.ConvertFromString(selectedColor);
-            }
-        }
-
         private void OnThicknessChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (paintCanvas != null && thicknessSlider != null)
@@ -184,6 +175,37 @@ namespace PureSketch
 
             ScaleTransform scale = new(_zoomLevel, _zoomLevel);
             paintCanvas.LayoutTransform = scale;
+        }
+
+        private void OnColorHexChanged(object sender, TextChangedEventArgs e)
+        {
+            // Get the hex value from the TextBox
+            string hexColor = colorHexInput.Text;
+
+            // Ensure the hex value is valid
+            if (IsValidHex(hexColor))
+            {
+                try
+                {
+                    // Convert hex to Color
+                    Color color = (Color)ColorConverter.ConvertFromString(hexColor);
+
+                    // Update the drawing color of the InkCanvas
+                    paintCanvas.DefaultDrawingAttributes.Color = color;
+                }
+                catch
+                {
+                    // Handle any exceptions that might occur during the conversion
+                    MessageBox.Show("Invalid color value. Please enter a valid hex color.");
+                }
+            }
+        }
+
+        // Helper method to check if the hex value is valid
+        private static bool IsValidHex(string hex)
+        {
+            // A simple check to ensure the hex starts with '#' and has either 7 or 9 characters (for RGB or ARGB)
+            return (hex.StartsWith("#") && (hex.Length == 7 || hex.Length == 9));
         }
 
     }
