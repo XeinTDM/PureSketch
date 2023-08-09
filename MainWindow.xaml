@@ -67,7 +67,8 @@
                 <TextBlock
                     Margin="10"
                     VerticalAlignment="Center"
-                    Text="Thickness:" Foreground="White" />
+                    Foreground="White"
+                    Text="Thickness:" />
                 <Slider
                     Name="thicknessSlider"
                     Width="120"
@@ -92,16 +93,35 @@
             <ScrollViewer
                 Background="#262626"
                 HorizontalScrollBarVisibility="Auto"
-                VerticalScrollBarVisibility="Auto">
+                VerticalScrollBarVisibility="Auto" Width="1000" Height="802">
                 <InkCanvas
                     Name="paintCanvas"
                     Width="50"
                     Height="50"
                     Background="White"
                     Cursor="Pen"
-                    MouseWheel="OnPaintCanvasMouseWheel" />
+                    MouseWheel="OnPaintCanvasMouseWheel"
+                    StrokeCollected="OnPaintCanvasStrokeCollected" />
+
             </ScrollViewer>
         </DockPanel>
+
+        <ListBox
+            x:Name="LayersListBox"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom" Height="263" RenderTransformOrigin="0.5,0.5" Width="183" Margin="0,0,-5,-5">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsVisible}" />
+                        <Button Click="DeleteLayer_Click" Content="Delete" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
         <local:CanvasSizeDialog x:Name="canvasSizeDialog" Visibility="Collapsed" />
     </Grid>
 </Window>

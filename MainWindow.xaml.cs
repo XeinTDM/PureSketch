@@ -7,21 +7,51 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.ComponentModel;
 
 namespace PureSketch
 {
     public partial class MainWindow : Window
     {
+        private ObservableCollection<Layer> _layers = new ObservableCollection<Layer>();
         private readonly StrokeCollection _undoStrokes = new();
         private StrokeCollection _clipboardStrokes = new();
         private double _zoomLevel = 1.0;
         private const double ZoomFactor = 0.2;
+        private Layer _currentLayer;
 
         public MainWindow()
         {
             InitializeComponent();
-            canvasSizeDialog.DialogConfirmed += CanvasSizeDialog_Confirmed;
-            ShowCanvasSizeDialog();
+            LayersListBox.ItemsSource = _layers;
+            AddNewLayer();
+            paintCanvas.StrokeCollected += OnPaintCanvasStrokeCollected;
+        }
+
+        private void AddNewLayer()
+        {
+            _currentLayer = new Layer { Name = $"Layer {_layers.Count + 1}" };
+            _layers.Add(_currentLayer);
+            LayersListBox.SelectedItem = _currentLayer;
+        }
+
+        private void DeleteLayer_Click(object sender, RoutedEventArgs e)
+        {
+            if (LayersListBox.SelectedItem is Layer selectedLayer)
+            {
+                _layers.Remove(selectedLayer);
+                if (!_layers.Any())
+                {
+                    AddNewLayer();
+                }
+            }
+        }
+
+        private void OnPaintCanvasStrokeCollected(object sender, InkCanvasStrokeCollectedEventArgs e)
+        {
+            _currentLayer.Strokes.Add(e.Stroke);
         }
 
         private void ShowCanvasSizeDialog()
@@ -243,7 +273,5 @@ namespace PureSketch
 
             ApplyZoom();
         }
-
-
     }
 }

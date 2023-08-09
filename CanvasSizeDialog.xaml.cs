@@ -13,10 +13,7 @@ namespace PureSketch
 
         public event EventHandler DialogConfirmed; // Event to notify when the user confirms the dialog
 
-        public CanvasSizeDialog()
-        {
-            InitializeComponent();
-        }
+        public CanvasSizeDialog() => InitializeComponent();
 
         private void OnOkClick(object sender, RoutedEventArgs e)
         {
