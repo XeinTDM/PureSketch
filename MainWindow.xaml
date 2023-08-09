@@ -4,15 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    Title="PureSketch"
     Width="900"
     Height="600"
     Background="{DynamicResource MaterialDesignPaper}"
+    KeyDown="OnMainWindowKeyDown"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
     WindowStartupLocation="CenterScreen"
     WindowState="Normal"
     WindowStyle="None">
-
     <DockPanel>
         <!--  Top Menu  -->
         <Menu VerticalAlignment="Top" DockPanel.Dock="Top">
@@ -85,11 +84,14 @@
                 Style="{DynamicResource MaterialDesignFlatButton}" />
         </StackPanel>
 
-        <!--  Drawing Canvas  -->
-        <InkCanvas
-            Name="paintCanvas"
-            Margin="10"
-            Background="White"
-            Cursor="Pen" />
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <InkCanvas
+                Name="paintCanvas"
+                Width="50"
+                Height="50"
+                Background="White"
+                Cursor="Pen"
+                MouseWheel="OnPaintCanvasMouseWheel" />
+        </ScrollViewer>
     </DockPanel>
 </Window>

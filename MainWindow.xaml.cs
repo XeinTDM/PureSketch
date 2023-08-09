@@ -5,6 +5,8 @@ using System.Windows.Ink;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Input;
+using System;
 
 namespace PureSketch
 {
@@ -18,7 +20,51 @@ namespace PureSketch
         public MainWindow()
         {
             InitializeComponent();
+
+            CanvasSizeDialog sizeDialog = new CanvasSizeDialog();
+            if (sizeDialog.ShowDialog() == true)
+            {
+                paintCanvas.Width = sizeDialog.CanvasWidth;
+                paintCanvas.Height = sizeDialog.CanvasHeight;
+            }
+            else
+            {
+                // Handle case where user closes the dialog without entering values, e.g., close the application.
+                this.Close();
+            }
+
             paintCanvas.DefaultDrawingAttributes.Color = Colors.Black;
+        }
+
+        private void OnMainWindowKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                switch (e.Key)
+                {
+                    case Key.Z:
+                        OnUndoClick(sender, e);
+                        break;
+                    case Key.Y:
+                        OnRedoClick(sender, e);
+                        break;
+                    case Key.S:
+                        OnSaveClick(sender, e);
+                        break;
+                    case Key.O:
+                        OnOpenClick(sender, e);
+                        break;
+                    case Key.X:
+                        OnCutClick(sender, e);
+                        break;
+                    case Key.C:
+                        OnCopyClick(sender, e);
+                        break;
+                    case Key.V:
+                        OnPasteClick(sender, e);
+                        break;
+                }
+            }
         }
 
         private void OnClearClick(object sender, RoutedEventArgs e)
@@ -60,71 +106,49 @@ namespace PureSketch
             paintCanvas.Strokes.Clear();
         }
 
-        private static void SaveCanvasAsPng(string filename, InkCanvas canvas)
+        private static void SaveCanvasAsPng(string filename, InkCanvas canvas, double width, double height)
         {
-            int width = (int)canvas.ActualWidth;
-            int height = (int)canvas.ActualHeight;
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)width, (int)height, 96d, 96d, PixelFormats.Default);
+            rtb.Render(canvas);
 
-            if (width <= 0 || height <= 0)
+            PngBitmapEncoder pngEncoder = new PngBitmapEncoder();
+            pngEncoder.Frames.Add(BitmapFrame.Create(rtb));
+
+            using (FileStream fs = new FileStream(filename, FileMode.Create))
             {
-                MessageBox.Show("Canvas size is invalid.");
-                return;
+                pngEncoder.Save(fs);
             }
-
-            int toolboxWidth = 150; // Adjust as per your toolbox width
-
-            // Create a temporary RenderTargetBitmap to capture InkCanvas
-            RenderTargetBitmap tempRtb = new((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96d, 96d, PixelFormats.Default);
-            tempRtb.Render(canvas);
-
-            width -= toolboxWidth;
-
-            RenderTargetBitmap finalRtb = new(width, height, 96d, 96d, PixelFormats.Default);
-
-            // Offset the drawing to "crop" out the toolbox area
-            DrawingVisual drawingVisual = new();
-            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
-            {
-                drawingContext.DrawImage(tempRtb, new Rect(0, 0, width, height));
-            }
-            finalRtb.Render(drawingVisual);
-
-            PngBitmapEncoder pngEncoder = new();
-            pngEncoder.Frames.Add(BitmapFrame.Create(finalRtb));
-
-            using FileStream fs = File.OpenWrite(filename);
-            pngEncoder.Save(fs);
         }
-
 
         private void OnSaveClick(object sender, RoutedEventArgs e)
         {
-            var saveFileDialog = new SaveFileDialog
-            {
-                Filter = "PNG Files (*.png)|*.png"
-            };
-
+            var saveFileDialog = new SaveFileDialog { Filter = "PNG Files (*.png)|*.png" };
             if (saveFileDialog.ShowDialog() == true)
             {
-                SaveCanvasAsPng(saveFileDialog.FileName, paintCanvas);
+                SaveCanvasAsPng(saveFileDialog.FileName, paintCanvas, paintCanvas.Width, paintCanvas.Height);
             }
         }
 
 
-        // Load Canvas Strokes from a File
         private void OnOpenClick(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filter = "Ink Files (*.ink)|*.ink"
+                Filter = "PNG Files (*.png)|*.png"
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
-                using var fs = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
-                StrokeCollection strokes = new(fs);
-                paintCanvas.Strokes = strokes;
-                fs.Close();
+                BitmapImage bitmap = new BitmapImage(new Uri(openFileDialog.FileName));
+                Image image = new Image
+                {
+                    Source = bitmap,
+                    Width = bitmap.Width,
+                    Height = bitmap.Height
+                };
+
+                paintCanvas.Strokes.Clear();
+                paintCanvas.Children.Add(image);
             }
         }
 
@@ -170,10 +194,9 @@ namespace PureSketch
 
         private void ApplyZoom()
         {
-            if (_zoomLevel < 0.2) _zoomLevel = 0.2; // Minimum zoom level
-            if (_zoomLevel > 5) _zoomLevel = 5;     // Maximum zoom level
-
-            ScaleTransform scale = new(_zoomLevel, _zoomLevel);
+            if (_zoomLevel < 0.2) _zoomLevel = 0.2;
+            if (_zoomLevel > 5) _zoomLevel = 5;
+            ScaleTransform scale = new ScaleTransform(_zoomLevel, _zoomLevel);
             paintCanvas.LayoutTransform = scale;
         }
 
@@ -184,5 +207,26 @@ namespace PureSketch
                 paintCanvas.DefaultDrawingAttributes.Color = e.NewValue.Value;
             }
         }
+
+        private void OnPaintCanvasMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Point mousePosition = e.GetPosition(paintCanvas);
+            double relativeX = mousePosition.X / paintCanvas.ActualWidth;
+            double relativeY = mousePosition.Y / paintCanvas.ActualHeight;
+
+            paintCanvas.RenderTransformOrigin = new Point(relativeX, relativeY);
+
+            if (e.Delta > 0)
+            {
+                _zoomLevel += ZoomFactor;
+            }
+            else
+            {
+                _zoomLevel -= ZoomFactor;
+            }
+            ApplyZoom();
+        }
+
+
     }
 }
