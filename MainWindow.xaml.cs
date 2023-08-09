@@ -12,6 +12,8 @@ namespace PureSketch
     {
         private readonly StrokeCollection _undoStrokes = new();
         private StrokeCollection _clipboardStrokes = new();
+        private double _zoomLevel = 1.0;
+        private const double ZoomFactor = 0.2;
 
         public MainWindow()
         {
@@ -28,7 +30,7 @@ namespace PureSketch
         {
             if (paintCanvas.Strokes.Count > 0)
             {
-                var lastStroke = paintCanvas.Strokes[paintCanvas.Strokes.Count - 1];
+                var lastStroke = paintCanvas.Strokes[^1];
                 _undoStrokes.Add(lastStroke);
                 paintCanvas.Strokes.Remove(lastStroke);
             }
@@ -38,7 +40,7 @@ namespace PureSketch
         {
             if (_undoStrokes.Count > 0)
             {
-                var lastUndoStroke = _undoStrokes[_undoStrokes.Count - 1];
+                var lastUndoStroke = _undoStrokes[^1];
                 paintCanvas.Strokes.Add(lastUndoStroke);
                 _undoStrokes.Remove(lastUndoStroke);
             }
@@ -99,10 +101,8 @@ namespace PureSketch
             PngBitmapEncoder pngEncoder = new();
             pngEncoder.Frames.Add(BitmapFrame.Create(finalRtb));
 
-            using (FileStream fs = File.OpenWrite(filename))
-            {
-                pngEncoder.Save(fs);
-            }
+            using FileStream fs = File.OpenWrite(filename);
+            pngEncoder.Save(fs);
         }
 
 
@@ -164,5 +164,27 @@ namespace PureSketch
                 paintCanvas.Strokes.Add(stroke.Clone());
             }
         }
+
+        private void OnZoomInClick(object sender, RoutedEventArgs e)
+        {
+            _zoomLevel += ZoomFactor;
+            ApplyZoom();
+        }
+
+        private void OnZoomOutClick(object sender, RoutedEventArgs e)
+        {
+            _zoomLevel -= ZoomFactor;
+            ApplyZoom();
+        }
+
+        private void ApplyZoom()
+        {
+            if (_zoomLevel < 0.2) _zoomLevel = 0.2; // Minimum zoom level
+            if (_zoomLevel > 5) _zoomLevel = 5;     // Maximum zoom level
+
+            ScaleTransform scale = new(_zoomLevel, _zoomLevel);
+            paintCanvas.LayoutTransform = scale;
+        }
+
     }
 }
