@@ -110,7 +110,6 @@
             x:Name="LayersListBox"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom" Height="263" RenderTransformOrigin="0.5,0.5" Width="183" Margin="0,0,-5,-5">
-
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
