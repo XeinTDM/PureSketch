@@ -92,12 +92,13 @@ namespace PureSketch
             }
         }
 
-        private void OnThicknessChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void OnThicknessChanged(object? sender, RoutedPropertyChangedEventArgs<double>? e)
         {
             if (paintCanvas != null && thicknessSlider != null)
             {
-                paintCanvas.DefaultDrawingAttributes.Width = thicknessSlider.Value;
-                paintCanvas.DefaultDrawingAttributes.Height = thicknessSlider.Value;
+                double adjustedThickness = thicknessSlider.Value / _zoomLevel;
+                paintCanvas.DefaultDrawingAttributes.Width = adjustedThickness;
+                paintCanvas.DefaultDrawingAttributes.Height = adjustedThickness;
             }
         }
 
@@ -198,6 +199,9 @@ namespace PureSketch
             if (_zoomLevel > 5) _zoomLevel = 5;
             ScaleTransform scale = new ScaleTransform(_zoomLevel, _zoomLevel);
             paintCanvas.LayoutTransform = scale;
+
+            // Adjust the stroke thickness based on the zoom level
+            OnThicknessChanged(null, null);
         }
 
         private void OnColorPickerSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)

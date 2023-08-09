@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 namespace PureSketch {
 
@@ -7,6 +8,7 @@ namespace PureSketch {
     {
         public double CanvasWidth { get; private set; }
         public double CanvasHeight { get; private set; }
+
 
         public CanvasSizeDialog()
         {

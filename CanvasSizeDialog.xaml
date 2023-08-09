@@ -32,6 +32,7 @@
                 VerticalAlignment="Center"
                 Text="Height:" />
             <TextBox Name="HeightTextBox" Width="100" />
+
         </StackPanel>
 
         <Button
